@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from ..database import get_db
 from ..models import Employee, User
 from ..schemas import EmployeeCreate, EmployeeResponse
+from ..auth import get_current_user
 
 
 router = APIRouter(
@@ -38,7 +39,8 @@ def create_employee(
 
 @router.get("/", response_model=list[EmployeeResponse])
 def get_employees(
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user)
 ):
     employees = db.query(Employee).all()
 

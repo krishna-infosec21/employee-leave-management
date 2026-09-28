@@ -112,3 +112,32 @@ def reject_leave(
     db.refresh(leave)
 
     return leave
+
+
+@router.put("/{leave_id}/cancel", response_model=LeaveRequestResponse)
+def cancel_leave(
+    leave_id: int,
+    db: Session = Depends(get_db)
+):
+    leave = db.query(LeaveRequest).filter(
+        LeaveRequest.id == leave_id
+    ).first()
+
+    if not leave:
+        raise HTTPException(
+            status_code=404,
+            detail="Leave request not found"
+        )
+
+    if leave.status != "PENDING":
+        raise HTTPException(
+            status_code=400,
+            detail="Only pending leave requests can be cancelled"
+        )
+
+    leave.status = "CANCELLED"
+
+    db.commit()
+    db.refresh(leave)
+
+    return leave

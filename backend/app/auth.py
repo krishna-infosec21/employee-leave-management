@@ -1,66 +1,106 @@
 import os
+from pathlib import Path
 from datetime import datetime, timedelta, timezone
 
 from dotenv import load_dotenv
-from jose import JWTError, jwt
+from jose import jwt, JWTError
 from passlib.context import CryptContext
+from fastapi import HTTPException, status, Security
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
-load_dotenv()
 
-SECRET_KEY = os.getenv("JWT_SECRET", "change-this-secret-key")
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_HOURS = 8
+BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(BASE_DIR / ".env")
+
 
 pwd_context = CryptContext(
     schemes=["bcrypt"],
     deprecated="auto"
 )
 
+security = HTTPBearer()
+
+JWT_SECRET = os.getenv("JWT_SECRET")
+JWT_ALGORITHM = "HS256"
+JWT_EXPIRE_HOURS = 8
+
+
+if not JWT_SECRET:
+    raise RuntimeError(
+        "JWT_SECRET is not set in backend/.env"
+    )
+
 
 def hash_password(password: str) -> str:
     return pwd_context.hash(password)
 
 
-def verify_password(password: str, hashed_password: str) -> bool:
-    return pwd_context.verify(password, hashed_password)
+def verify_password(
+    password: str,
+    password_hash: str
+) -> bool:
+    return pwd_context.verify(
+        password,
+        password_hash
+    )
 
 
-def create_access_token(user_id: int, role: str) -> str:
+def create_access_token(
+    user_id: int,
+    role: str
+) -> str:
+
     expire = datetime.now(timezone.utc) + timedelta(
-        hours=ACCESS_TOKEN_EXPIRE_HOURS
+        hours=JWT_EXPIRE_HOURS
     )
 
     payload = {
-        "user_id": user_id,
+        "sub": str(user_id),
         "role": role,
         "exp": expire
     }
 
     return jwt.encode(
         payload,
-        SECRET_KEY,
-        algorithm=ALGORITHM
+        JWT_SECRET,
+        algorithm=JWT_ALGORITHM
     )
 
 
-def decode_access_token(token: str):
+def verify_access_token(token: str):
     try:
         payload = jwt.decode(
             token,
-            SECRET_KEY,
-            algorithms=[ALGORITHM]
+            JWT_SECRET,
+            algorithms=[JWT_ALGORITHM]
         )
 
-        user_id = payload.get("user_id")
+        user_id = payload.get("sub")
         role = payload.get("role")
 
         if user_id is None or role is None:
             return None
 
         return {
-            "user_id": user_id,
+            "user_id": int(user_id),
             "role": role
         }
 
-    except JWTError:
+    except (JWTError, ValueError):
         return None
+
+
+def get_current_user(
+    credentials: HTTPAuthorizationCredentials = Security(security)
+):
+    token = credentials.credentials
+
+    user = verify_access_token(token)
+
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired token"
+        )
+
+    return user

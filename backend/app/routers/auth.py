@@ -4,7 +4,11 @@ from sqlalchemy.orm import Session
 from ..database import get_db
 from ..models import User, Employee
 from ..schemas import UserCreate, UserResponse
-from ..auth import hash_password, verify_password
+from ..auth import (
+    hash_password,
+    verify_password,
+    create_access_token
+)
 
 
 router = APIRouter(
@@ -77,14 +81,24 @@ def login(
             detail="Invalid username or password"
         )
 
-    if not verify_password(password, user.password_hash):
+    if not verify_password(
+        password,
+        user.password_hash
+    ):
         raise HTTPException(
             status_code=401,
             detail="Invalid username or password"
         )
 
+    access_token = create_access_token(
+        user_id=user.id,
+        role=user.role
+    )
+
     return {
         "message": "Login successful",
+        "access_token": access_token,
+        "token_type": "bearer",
         "user_id": user.id,
         "username": user.username,
         "role": user.role
