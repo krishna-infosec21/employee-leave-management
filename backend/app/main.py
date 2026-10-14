@@ -6,7 +6,7 @@ from .routers import auth
 from .routers import employees
 from .routers import leaves
 from .routers import documents
-
+from .routers import admin
 
 Base.metadata.create_all(bind=engine)
 
@@ -30,6 +30,7 @@ app.include_router(auth.router)
 app.include_router(employees.router)
 app.include_router(leaves.router)
 app.include_router(documents.router)
+app.include_router(admin.router)
 
 
 @app.get("/")

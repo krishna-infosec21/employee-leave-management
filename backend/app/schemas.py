@@ -7,7 +7,7 @@ class EmployeeCreate(BaseModel):
     name: str
     email: str
     department_id: int
-
+    manager_id: int | None = None
 
 class EmployeeResponse(BaseModel):
     id: int
@@ -22,7 +22,7 @@ class EmployeeResponse(BaseModel):
 
 class LeaveAction(BaseModel):
     status: str
-
+    manager_comment: str | None = None
 
 class LeaveRequestCreate(BaseModel):
     employee_id: int
@@ -40,10 +40,10 @@ class LeaveRequestResponse(BaseModel):
     to_date: date
     reason: str
     status: str
+    manager_comment: str | None = None
 
     class Config:
         from_attributes = True
-
 
 class UserCreate(BaseModel):
     username: str
