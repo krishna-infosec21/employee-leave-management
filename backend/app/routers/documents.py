@@ -5,7 +5,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from ..database import get_db
-from ..models import Document
+from ..models import Document, Employee
+from ..auth import get_current_user
 
 
 BUCKET_NAME = "leaveapp-documents-2117"
@@ -25,12 +26,50 @@ router = APIRouter(
 )
 
 
-# Check whether the file really exists in S3
+def get_employee_profile(db: Session, user_id: int):
+    return db.query(Employee).filter(
+        Employee.user_id == user_id
+    ).first()
+
+
+def can_access_document(db: Session, document, current_user: dict):
+    role = current_user.get("role")
+    user_id = int(current_user["user_id"])
+
+    if role == "ADMIN":
+        return True
+
+    employee = get_employee_profile(db, user_id)
+
+    if not employee:
+        raise HTTPException(
+            status_code=404,
+            detail="Employee profile not found"
+        )
+
+    if document.employee_id == employee.id:
+        return True
+
+    if role == "MANAGER":
+        report = db.query(Employee).filter(
+            Employee.id == document.employee_id,
+            Employee.manager_id == employee.id
+        ).first()
+
+        if report:
+            return True
+
+    raise HTTPException(
+        status_code=403,
+        detail="You are not authorized to access this document"
+    )
+
+
 def check_s3_file(s3_key: str):
     if not s3_key or not s3_key.strip():
         raise HTTPException(
             status_code=400,
-            detail="S3 file key cannot be empty."
+            detail="S3 file key cannot be empty"
         )
 
     try:
@@ -38,53 +77,57 @@ def check_s3_file(s3_key: str):
             Bucket=BUCKET_NAME,
             Key=s3_key.strip()
         )
-
     except ClientError as e:
-        error_code = e.response.get(
-            "Error", {}
-        ).get("Code", "")
+        code = e.response.get("Error", {}).get("Code", "")
 
-        if error_code in ("404", "NoSuchKey", "NotFound"):
+        if code in ("404", "NoSuchKey", "NotFound"):
             raise HTTPException(
                 status_code=404,
-                detail=f"File not found in S3: {s3_key}"
+                detail="File not found in S3"
             )
 
-        if error_code in ("403", "AccessDenied"):
+        if code in ("403", "AccessDenied"):
             raise HTTPException(
                 status_code=403,
-                detail="AWS permission denied. Check S3 permissions."
+                detail="AWS permission denied"
             )
 
         raise HTTPException(
             status_code=500,
-            detail=f"S3 error: {error_code}"
-        )
-
-    except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Unable to verify S3 file: {str(e)}"
+            detail="Unable to verify S3 file"
         )
 
 
-# Create a document record only if the S3 file exists
 @router.post("/")
 def create_document(
     employee_id: int,
     file_name: str,
     s3_key: str,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user)
 ):
-    s3_key = s3_key.strip()
+    if current_user.get("role") != "ADMIN":
+        raise HTTPException(
+            status_code=403,
+            detail="Only admins can create document records"
+        )
 
-    # Verify the actual file before saving its details
+    employee = db.query(Employee).filter(
+        Employee.id == employee_id
+    ).first()
+
+    if not employee:
+        raise HTTPException(
+            status_code=404,
+            detail="Employee not found"
+        )
+
     check_s3_file(s3_key)
 
     document = Document(
         employee_id=employee_id,
         file_name=file_name,
-        s3_key=s3_key
+        s3_key=s3_key.strip()
     )
 
     db.add(document)
@@ -94,21 +137,50 @@ def create_document(
     return document
 
 
-# List documents
 @router.get("/")
 def get_documents(
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user)
 ):
-    documents = db.query(Document).all()
+    role = current_user.get("role")
+    user_id = int(current_user["user_id"])
 
-    return documents
+    if role == "ADMIN":
+        return db.query(Document).all()
+
+    employee = get_employee_profile(db, user_id)
+
+    if not employee:
+        raise HTTPException(
+            status_code=404,
+            detail="Employee profile not found"
+        )
+
+    query = db.query(Document).filter(
+        Document.employee_id == employee.id
+    )
+
+    if role == "MANAGER":
+        report_ids = db.query(Employee.id).filter(
+            Employee.manager_id == employee.id
+        ).all()
+
+        ids = [row[0] for row in report_ids]
+
+        if ids:
+            query = db.query(Document).filter(
+                (Document.employee_id == employee.id)
+                | (Document.employee_id.in_(ids))
+            )
+
+    return query.all()
 
 
-# Get document details
 @router.get("/{document_id}")
 def get_document(
     document_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user)
 ):
     document = db.query(Document).filter(
         Document.id == document_id
@@ -117,17 +189,18 @@ def get_document(
     if not document:
         raise HTTPException(
             status_code=404,
-            detail="Document not found in database."
+            detail="Document not found"
         )
 
+    can_access_document(db, document, current_user)
     return document
 
 
-# Download a document
 @router.get("/{document_id}/download")
 def download_document(
     document_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user)
 ):
     document = db.query(Document).filter(
         Document.id == document_id
@@ -136,10 +209,10 @@ def download_document(
     if not document:
         raise HTTPException(
             status_code=404,
-            detail="Document not found in database."
+            detail="Document not found"
         )
 
-    # Check that the actual S3 object exists
+    can_access_document(db, document, current_user)
     check_s3_file(document.s3_key)
 
     try:
@@ -152,12 +225,10 @@ def download_document(
             ExpiresIn=3600
         )
 
-        return {
-            "download_url": download_url
-        }
+        return {"download_url": download_url}
 
-    except Exception as e:
+    except Exception:
         raise HTTPException(
             status_code=500,
-            detail=f"Unable to generate download link: {str(e)}"
+            detail="Unable to generate download link"
         )
