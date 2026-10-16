@@ -1,4 +1,4 @@
-# LeaveFlow - Employee Leave Management System
+﻿# LeaveFlow - Employee Leave Management System
 
 A web-based employee leave management application built with React, FastAPI, PostgreSQL, and AWS.
 
