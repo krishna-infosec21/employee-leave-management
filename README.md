@@ -1,80 +1,97 @@
-﻿<div align="center">
+﻿# Employee Leave Management System
 
-# Employee Leave Management System
+### A Full-Stack Web Application Deployed on AWS
 
-### A Cloud-Deployed Full-Stack Web Application
+An employee leave management application designed to simplify leave applications, approval workflows, leave balance tracking, and employee document management.
 
-A centralized platform for employee leave applications, approvals, leave balance tracking, and document management.
+## Project Overview
 
-<br>
+The Employee Leave Management System provides role-based functionality for employees, managers, and administrators. It combines a React frontend, FastAPI backend, PostgreSQL database, and AWS cloud infrastructure.
 
-![React](https://img.shields.io/badge/Frontend-React-61DAFB?style=for-the-badge&logo=react&logoColor=black)
-![FastAPI](https://img.shields.io/badge/Backend-FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)
-![Python](https://img.shields.io/badge/Language-Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
-![PostgreSQL](https://img.shields.io/badge/Database-PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)
-![AWS](https://img.shields.io/badge/Cloud-AWS-232F3E?style=for-the-badge&logo=amazonaws&logoColor=white)
+This project demonstrates full-stack application development, REST API integration, database management, authentication, and cloud deployment.
 
-</div>
+## Key Features
 
----
+* **User Authentication:** Registration and login with JWT-based authentication.
+* **Employee Dashboard:** View profile information and manage leave-related activities.
+* **Leave Applications:** Submit leave requests and track their status.
+* **Leave Balance:** View available leave information.
+* **Document Management:** Access and download employee documents.
+* **Manager Dashboard:** Review team information and leave requests.
+* **Leave Approvals:** Approve or reject leave requests.
+* **Admin Dashboard:** View employee records, leave requests, and document information.
+* **REST API:** Backend API documentation through Swagger UI.
+* **Cloud Infrastructure:** AWS services for hosting, storage, database, DNS, and content delivery.
 
-## 📌 Project Overview
+## Technology Stack
 
-The **Employee Leave Management System** is designed to simplify leave management through a centralized web application. Employees can submit and track leave requests, managers can review requests, and administrators can oversee employee and leave records.
+| Component         | Technology                    |
+| ----------------- | ----------------------------- |
+| Frontend          | React, JavaScript, Vite       |
+| Backend           | Python, FastAPI               |
+| Database          | PostgreSQL                    |
+| ORM               | SQLAlchemy                    |
+| Authentication    | JSON Web Tokens (JWT)         |
+| API Documentation | Swagger UI, OpenAPI           |
+| Compute           | Amazon EC2                    |
+| Load Balancing    | AWS Application Load Balancer |
+| Object Storage    | Amazon S3                     |
+| Managed Database  | Amazon RDS                    |
+| DNS               | Amazon Route 53               |
+| Content Delivery  | Amazon CloudFront             |
+| Version Control   | Git, GitHub                   |
 
-The project demonstrates full-stack development, REST API integration, database management, authentication, and AWS cloud deployment.
-
-## ✨ Key Features
-
-- **Role-Based Dashboards** — Separate interfaces for employees, managers, and administrators.
-- **Authentication** — Login and registration with JWT-based authentication.
-- **Leave Management** — Submit, track, approve, and reject leave requests.
-- **Leave Balance** — View available leave information.
-- **Document Management** — Access employee documents.
-- **REST API** — Backend endpoints documented using Swagger UI.
-- **Cloud Deployment** — AWS services for application hosting and supporting infrastructure.
-
-## 🛠️ Technology Stack
-
-| Component | Technology |
-|---|---|
-| Frontend | React |
-| Backend | Python, FastAPI |
-| Database | PostgreSQL |
-| Authentication | JSON Web Tokens (JWT) |
-| API Documentation | Swagger UI / OpenAPI |
-| Compute | AWS EC2 |
-| Load Balancing | AWS Application Load Balancer |
-| Object Storage | AWS S3 |
-| Managed Database | AWS RDS |
-| DNS | Amazon Route 53 |
-| Content Delivery | Amazon CloudFront |
-
----
-
-## 🏗️ Architecture
+## Application Architecture
 
 ```text
-                 Users
-                   |
-                   v
+                  Users
+                    |
+                    v
              React Frontend
-                   |
-                   v
-          AWS Application Load Balancer
-                   |
-                   v
+                    |
+                    v
+          AWS Cloud Infrastructure
+                    |
+                    v
+       Application Load Balancer
+                    |
+                    v
              FastAPI Backend
-                   |
-                   v
-           PostgreSQL on AWS RDS
-````
+                    |
+                    v
+        PostgreSQL on Amazon RDS
 
-The application separates the frontend, backend API, and database into distinct layers. AWS services provide the hosting and infrastructure components used by the deployment.
+     Amazon S3: Frontend and Documents
+     Route 53: DNS Configuration
+     CloudFront: Content Delivery
+```
 
-> The diagram is a logical overview. The exact request path depends on the configured frontend URL, load balancer listeners, and backend routes.
+This is a logical overview of the application architecture. Actual request routing depends on the deployed configuration.
 
-## 📁 Project Structure
+## Application Roles
+
+### Employee
+
+* Access the employee dashboard.
+* View profile information.
+* Apply for leave.
+* Track leave requests.
+* View leave balance.
+* Access available documents.
+
+### Manager
+
+* View team information.
+* Review employee leave requests.
+* Approve or reject requests.
+
+### Administrator
+
+* View employee information.
+* Monitor leave requests and their statuses.
+* Access administrative document information.
+
+## Project Structure
 
 ```text
 employee-leave-management/
@@ -101,267 +118,178 @@ employee-leave-management/
 ├── database/
 │   └── schema.sql
 │
-├── screenshots/
+├── docs/
+│   ├── README.md
+│   ├── api-reference.md
+│   ├── architecture.md
+│   ├── database.md
+│   ├── deployment.md
+│   ├── security.md
+│   ├── testing.md
+│   └── troubleshooting.md
+│
+├── scripts/
+│   ├── README.md
+│   ├── deployment-notes.md
+│   ├── health-check.sh
+│   └── user-data.sh
+│
+├── LICENSE.txt
+├── .gitignore
 └── README.md
 ```
 
----
+## AWS Deployment
 
-# 🖥️ Project Screenshots
+The project uses AWS services to demonstrate cloud deployment and infrastructure integration.
 
-## 🔐 Employee Portal
+| AWS Service               | Purpose                                         |
+| ------------------------- | ----------------------------------------------- |
+| Amazon EC2                | Hosts the backend application                   |
+| Application Load Balancer | Routes requests to configured backend targets   |
+| Amazon S3                 | Stores frontend assets and configured documents |
+| Amazon RDS                | Provides managed PostgreSQL database hosting    |
+| Amazon Route 53           | Manages DNS records                             |
+| Amazon CloudFront         | Delivers configured frontend content            |
 
-### 1. Login Page
+The exact configuration and request flow depend on the deployed AWS resources.
 
-![Login Page](screenshots/01-login-page.png)
+## API Documentation
 
-### 2. Registration Page
+The backend uses FastAPI and OpenAPI to document the REST API.
 
-![Registration Page](screenshots/02-register-page.png)
+When the backend is running locally, the interactive API documentation is available at:
 
-### 3. Employee Dashboard
+`http://127.0.0.1:8000/docs`
 
-![Employee Dashboard](screenshots/03-employee-dashboard.png)
+The API documentation can be used to explore endpoints and test supported requests.
 
-### 4. Employee Profile
+## Local Development
 
-![Employee Profile](screenshots/04-employee-profile.png)
+### Prerequisites
 
-### 5. Apply Leave
+* Python
+* Node.js and npm
+* PostgreSQL
+* Git
 
-![Apply Leave](screenshots/05-apply-leave.png)
+### Backend Setup
 
-### 6. My Leaves
+1. Open a terminal in the project directory.
+2. Navigate to the backend folder.
+3. Create and activate a Python virtual environment.
+4. Install the dependencies listed in `backend/requirements.txt`.
+5. Configure the database connection and required environment variables.
+6. Start the FastAPI application.
 
-![My Leaves](screenshots/06-my-leaves.png)
+Example commands for Windows PowerShell:
 
-### 7. Leave Balance
+```powershell
+cd backend
+python -m venv venv
+.\venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+uvicorn app.main:app --reload
+```
 
-![Leave Balance](screenshots/07-leave-balance.png)
+Configure the required environment variables before starting the backend. Do not commit real passwords, JWT secrets, or AWS credentials.
 
-### 8. Employee Documents
+### Frontend Setup
 
-![Employee Documents](screenshots/08-employee-documents.png)
+Open a second terminal from the project root:
 
-### 9. Document Download
+```powershell
+cd frontend
+npm install
+npm run dev
+```
 
-![Document Download](screenshots/09-document-download.png)
+Open the local frontend URL shown by Vite in the terminal.
 
-## 👥 Manager Portal
+**Note:** Local development requires the database and backend configuration to be correct. The commands above describe the general workflow and may need adjustment to match your environment.
 
-### 10. Manager Dashboard
+## Documentation
 
-![Manager Dashboard](screenshots/10-manager-dashboard.png)
+Detailed project documentation is available in the `docs/` folder:
 
-### 11. Manager My Team
+* [API Reference](docs/api-reference.md)
+* [Architecture](docs/architecture.md)
+* [Database](docs/database.md)
+* [Deployment](docs/deployment.md)
+* [Security](docs/security.md)
+* [Testing](docs/testing.md)
+* [Troubleshooting](docs/troubleshooting.md)
 
-![Manager My Team](screenshots/11-manager-my-team.png)
+Deployment helper scripts and notes are available in the `scripts/` folder.
 
-### 12. Manager Leave Requests
+## Screenshots
 
-![Manager Leave Requests](screenshots/12-manager-leave-requests.png)
+Application screenshots can be added here to demonstrate the user interface and AWS deployment.
 
-## ⚙️ Admin Portal
+Suggested screenshot categories:
 
-### 13. Admin Dashboard
+* Login page
+* Employee dashboard
+* Employee profile
+* Apply leave
+* My leaves
+* Leave balance
+* Employee documents and download
+* Manager dashboard and leave requests
+* Admin dashboard and document management
+* Swagger API documentation
+* EC2 instance
+* Load balancer and target health
+* S3 frontend
+* Route 53 domain
+* CloudFront distribution
+* RDS database
 
-![Admin Dashboard](screenshots/13-admin-dashboard.png)
+Add screenshots from the repository's `screenshots/` folder when they are available, using relative Markdown image paths.
 
-### 14. Total Employees
+## Security Considerations
 
-![Total Employees](screenshots/14-admin-total-employees.png)
+* Keep passwords, JWT secrets, database credentials, and AWS access keys out of source control.
+* Configure environment variables securely.
+* Restrict database access to trusted sources.
+* Review role-based authorization for sensitive operations.
+* Verify document access permissions.
+* Use HTTPS for public application traffic.
+* Review AWS security groups, IAM permissions, and storage access policies before production use.
 
-### 15. Total Leave Requests
+The presence of authentication or security-related components does not by itself guarantee that the application is production-secure. Security testing and configuration review are necessary.
 
-![Total Leave Requests](screenshots/15-admin-total-leave-requests.png)
+## Learning Outcomes
 
-### 16. Pending Leaves
-
-![Pending Leaves](screenshots/16-admin-pending-leaves.png)
-
-### 17. Approved Leaves
-
-![Approved Leaves](screenshots/17-admin-approved-leaves.png)
-
-### 18. Rejected Leaves
-
-![Rejected Leaves](screenshots/18-admin-rejected-leaves.png)
-
-### 19. Admin Documents
-
-![Admin Documents](screenshots/19-admin-documents.png)
-
-### 20. Admin Document Download
-
-![Admin Document Download](screenshots/20-admin-document-download.png)
-
-## 🔌 API Documentation
-
-### 21. Swagger API Overview — Part 1
-
-![Swagger API Overview 1](screenshots/21-swagger-api-overview-1.png)
-
-### 22. Swagger API Overview — Part 2
-
-![Swagger API Overview 2](screenshots/22-swagger-api-overview-2.png)
-
-### 23. Swagger API Overview — Part 3
-
-![Swagger API Overview 3](screenshots/23-swagger-api-overview-3.png)
-
-## ☁️ AWS Infrastructure
-
-### 24. EC2 Instance
-
-![AWS EC2 Instance](screenshots/24-aws-ec2-instance.png)
-
-### 25. Application Load Balancer
-
-![AWS Load Balancer](screenshots/25-aws-load-balancer.png)
-
-### 26. Target Group Health
-
-![AWS Target Group Health](screenshots/26-aws-target-group-health.png)
-
-### 27. S3 Frontend
-
-![AWS S3 Frontend](screenshots/27-aws-s3-frontend.png)
-
-### 28. Route 53 Domain
-
-![AWS Route 53 Domain](screenshots/28-aws-route53-domain.png)
-
-### 29. CloudFront
-
-![AWS CloudFront](screenshots/29-aws-cloudfront.png)
-
-### 30. RDS Database
-
-![AWS RDS Database](screenshots/30-aws-rds-database.png)
-
----
-
-## ☁️ AWS Deployment
-
-The application uses AWS infrastructure to host application components and support cloud deployment.
-
-| AWS Service                   | Purpose                                                                  |
-| ----------------------------- | ------------------------------------------------------------------------ |
-| **Amazon EC2**                | Runs the backend application.                                            |
-| **Application Load Balancer** | Routes incoming traffic to configured backend targets.                   |
-| **Amazon S3**                 | Stores frontend assets and configured application documents.             |
-| **Amazon RDS**                | Hosts the PostgreSQL database.                                           |
-| **Amazon Route 53**           | Manages DNS records for the application domain.                          |
-| **Amazon CloudFront**         | Delivers configured frontend content through a content delivery network. |
-
-The services above describe the intended roles in this project. Actual traffic paths and access permissions depend on the deployed configuration.
-
-## 🎯 Purpose of Using AWS
-
-AWS was used to gain practical experience deploying a web application in a cloud environment.
-
-Key objectives include:
-
-* Hosting an application outside the local development environment.
-* Connecting a backend API to a managed relational database.
-* Learning load balancing and target health monitoring.
-* Working with object storage and cloud-based content delivery.
-* Configuring DNS for application access.
-* Understanding cloud infrastructure and service integration.
-
-## 🔒 Security
-
-Security-related components of the project include:
-
-* JWT-based authentication.
-* Role-based application access.
-* Backend request validation.
-* Database-backed persistence.
-* Environment-based configuration for sensitive settings.
-
-> These are implementation goals and components. A production deployment should also verify authorization rules, token handling, HTTPS configuration, secret storage, database access restrictions, logging, and document permissions.
-
-## 🎯 Project Scope
-
-The project focuses on:
-
-* Employee registration and authentication.
-* Employee profile and leave management.
-* Manager review of leave requests.
-* Administrative oversight of employee and leave records.
-* Document access workflows.
-* REST API and database integration.
-* Deployment and configuration of AWS infrastructure.
-
-## 🧪 Testing and Validation
-
-Testing and validation can cover the following areas:
-
-* Authentication and role-specific access.
-* Leave submission and status transitions.
-* Employee, manager, and administrator workflows.
-* REST API requests through Swagger UI.
-* Database connectivity and persistence.
-* Document access and download behavior.
-* AWS target group health and application availability.
-
-Actual test coverage depends on the tests executed during development and deployment.
-
-## 🎓 Key Learning Outcomes
-
-Through this project, the following skills were explored:
+This project provided practical experience with:
 
 * React frontend development.
 * FastAPI backend and REST API development.
 * PostgreSQL database integration.
 * JWT-based authentication.
-* API testing and debugging with Swagger UI.
+* API exploration and testing with Swagger UI.
 * AWS EC2 and load balancer configuration.
-* S3, RDS, DNS, and content delivery services.
-* Deploying and troubleshooting a multi-component application.
+* S3 object storage and RDS database hosting.
+* Route 53 DNS and CloudFront content delivery.
+* Git version control and GitHub documentation.
+* Cloud deployment troubleshooting.
 
-## 🚀 Future Improvements
-
-Potential improvements include:
+## Future Improvements
 
 * Automated unit and integration tests.
-* CI/CD pipeline for repeatable deployments.
-* Centralized monitoring, logging, and alerts.
-* More detailed audit trails for leave approvals.
-* Improved reporting and notification features.
-* Additional security testing and access-control reviews.
+* Continuous integration and deployment.
+* Centralized logging and monitoring.
+* Leave approval notifications.
+* Audit trails for administrative actions.
+* Additional security testing.
 * Infrastructure automation.
 
-## 📋 Project Summary
+## Author
 
-The Employee Leave Management System combines full-stack application development, database integration, authentication, API documentation, and AWS deployment in a practical project.
+**Krishna Kumar**
 
-It serves as a portfolio demonstration of application development and cloud infrastructure learning.
+Interested in AWS cloud technologies, application deployment, and full-stack development.
 
----
+## License
 
-## 👨‍💻 Author
-
-### Krishna Kumar
-
-**AWS Cloud Architecture | Cloud Enthusiast**
-
-Interested in cloud technologies, application deployment, and building practical solutions using AWS.
-
-[![GitHub](https://img.shields.io/badge/GitHub-krishna--infosec21-181717?style=for-the-badge\&logo=github\&logoColor=white)](https://github.com/krishna-infosec21)
-
----
-
-## 📄 License
-
-This project was created for learning, portfolio development, and demonstrating practical skills in full-stack development and AWS cloud architecture.
-
-No formal open-source license has been specified. Add a `LICENSE` file if you intend to distribute the project under specific reuse terms.
-
----
-
-<div align="center">
-
-**Built with dedication to continuous learning and cloud technology.**
-
-</div>
+This project is distributed under the MIT License. See [LICENSE.txt](LICENSE.txt) for details.
